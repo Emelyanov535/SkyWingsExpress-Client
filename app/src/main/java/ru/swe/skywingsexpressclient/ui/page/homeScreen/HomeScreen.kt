@@ -1,5 +1,7 @@
-package ru.swe.skywingsexpressclient.ui.page
+package ru.swe.skywingsexpressclient.ui.page.homeScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,11 +13,13 @@ import androidx.navigation.NavHostController
 import ru.swe.skywingsexpressclient.BannerSection
 import ru.swe.skywingsexpressclient.InfoCardsSection
 import ru.swe.skywingsexpressclient.R
-import ru.swe.skywingsexpressclient.SearchSection
+import ru.swe.skywingsexpressclient.businessLogic.vmodel.FlightFinderViewModel
+import ru.swe.skywingsexpressclient.ui.page.homeScreen.search.SearchSection
 import ru.swe.skywingsexpressclient.ui.theme.SWE_GREY
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, flightFinderViewModel: FlightFinderViewModel) {
     Column(
         modifier = Modifier
             .background(SWE_GREY)
@@ -23,8 +27,8 @@ fun HomeScreen(navController: NavHostController) {
             .verticalScroll(rememberScrollState())
     ) {
         BannerSection()
-        SearchSection()
-        InfoCardsSection("Личный кабинет", "ПОДРОБНЕЕ", R.drawable.ic_lc)
-        InfoCardsSection("Онлайн-табло", "ПОДРОБНЕЕ", R.drawable.ic_online_table)
+        SearchSection(flightFinderViewModel)
+//        InfoCardsSection("Личный кабинет", "ПОДРОБНЕЕ", R.drawable.ic_lc)
+//        InfoCardsSection("Онлайн-табло", "ПОДРОБНЕЕ", R.drawable.ic_online_table)
     }
 }

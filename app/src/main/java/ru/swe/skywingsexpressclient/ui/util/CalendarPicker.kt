@@ -1,4 +1,4 @@
-package ru.swe.skywingsexpressclient.ui.page
+package ru.swe.skywingsexpressclient.ui.util
 
 import android.os.Build
 import androidx.annotation.RequiresApi
