@@ -1,4 +1,4 @@
-package ru.swe.skywingsexpressclient.api
+package ru.swe.skywingsexpressclient.data.network
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -8,10 +8,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
-import ru.swe.skywingsexpressclient.api.model.FlightsDto
-import ru.swe.skywingsexpressclient.businessLogic.model.Flight
+import ru.swe.skywingsexpressclient.data.models.FlightsDto
 import ru.swe.skywingsexpressclient.ui.util.LocalDateTimeAdapter
 import java.time.LocalDateTime
 

@@ -1,6 +1,6 @@
 package ru.swe.skywingsexpressclient.di
 
-import ru.swe.skywingsexpressclient.businessLogic.repo.FlightRepo
+import ru.swe.skywingsexpressclient.data.repository.FlightRepo
 
 interface AppContainer {
     val flightRepo: FlightRepo

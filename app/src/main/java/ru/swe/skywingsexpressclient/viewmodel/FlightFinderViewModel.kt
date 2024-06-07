@@ -1,16 +1,13 @@
-package ru.swe.skywingsexpressclient.businessLogic.vmodel
+package ru.swe.skywingsexpressclient.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import ru.swe.skywingsexpressclient.api.model.FlightsDto
-import ru.swe.skywingsexpressclient.businessLogic.model.Flight
-import ru.swe.skywingsexpressclient.businessLogic.repo.FlightRepo
+import ru.swe.skywingsexpressclient.data.models.FlightsDto
+import ru.swe.skywingsexpressclient.data.repository.FlightRepo
 import java.time.LocalDate
 
 class FlightFinderViewModel(private val flightRepository: FlightRepo) : ViewModel() {

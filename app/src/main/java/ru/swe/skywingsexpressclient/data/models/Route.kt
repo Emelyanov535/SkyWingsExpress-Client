@@ -1,4 +1,4 @@
-package ru.swe.skywingsexpressclient.businessLogic.model
+package ru.swe.skywingsexpressclient.data.models
 
 import kotlinx.serialization.Serializable
 

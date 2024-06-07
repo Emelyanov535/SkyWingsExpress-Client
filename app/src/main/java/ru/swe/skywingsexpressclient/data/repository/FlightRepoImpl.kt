@@ -1,11 +1,9 @@
-package ru.swe.skywingsexpressclient.api.repository
+package ru.swe.skywingsexpressclient.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import ru.swe.skywingsexpressclient.api.BackendService
-import ru.swe.skywingsexpressclient.api.model.FlightsDto
-import ru.swe.skywingsexpressclient.businessLogic.model.Flight
-import ru.swe.skywingsexpressclient.businessLogic.repo.FlightRepo
+import ru.swe.skywingsexpressclient.data.models.FlightsDto
+import ru.swe.skywingsexpressclient.data.network.BackendService
 
 class FlightRepoImpl(private val service: BackendService): FlightRepo {
     override suspend fun getFilteredFlightByDirectionAndDate(

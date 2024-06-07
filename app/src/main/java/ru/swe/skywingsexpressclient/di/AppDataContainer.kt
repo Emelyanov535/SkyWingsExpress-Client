@@ -1,8 +1,8 @@
 package ru.swe.skywingsexpressclient.di
 
-import ru.swe.skywingsexpressclient.api.BackendService
-import ru.swe.skywingsexpressclient.api.repository.FlightRepoImpl
-import ru.swe.skywingsexpressclient.businessLogic.repo.FlightRepo
+import ru.swe.skywingsexpressclient.data.network.BackendService
+import ru.swe.skywingsexpressclient.data.repository.FlightRepo
+import ru.swe.skywingsexpressclient.data.repository.FlightRepoImpl
 
 class AppDataContainer : AppContainer {
     override val flightRepo: FlightRepo by lazy {

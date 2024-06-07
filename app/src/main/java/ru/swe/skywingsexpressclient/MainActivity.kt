@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,18 +31,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import ru.swe.skywingsexpressclient.businessLogic.vmodel.AppViewModelProvider
-import ru.swe.skywingsexpressclient.businessLogic.vmodel.FlightFinderViewModel
 import ru.swe.skywingsexpressclient.ui.navigation.NavigationGraph
 import ru.swe.skywingsexpressclient.ui.theme.SWE_BLUE
 import ru.swe.skywingsexpressclient.ui.theme.SWE_GREY
 import ru.swe.skywingsexpressclient.ui.theme.SWE_LIGHT_BLUE
 import ru.swe.skywingsexpressclient.ui.theme.SWE_WHITE
 import ru.swe.skywingsexpressclient.ui.theme.SkyWingsExpressClientTheme
+import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
+import ru.swe.skywingsexpressclient.viewmodel.factories.AppViewModelProvider
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)

@@ -1,7 +1,6 @@
-package ru.swe.skywingsexpressclient.api.model
+package ru.swe.skywingsexpressclient.data.models
 
 import kotlinx.serialization.Serializable
-import ru.swe.skywingsexpressclient.businessLogic.model.Flight
 
 @Serializable
 data class FlightsDto(

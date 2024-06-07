@@ -40,20 +40,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import ru.swe.skywingsexpressclient.R
-import ru.swe.skywingsexpressclient.businessLogic.vmodel.FlightFinderViewModel
-import ru.swe.skywingsexpressclient.ui.util.CalendarModalScreen
-import ru.swe.skywingsexpressclient.ui.util.ModalScreen
 import ru.swe.skywingsexpressclient.ui.theme.SWE_GREY
 import ru.swe.skywingsexpressclient.ui.theme.SWE_RED
 import ru.swe.skywingsexpressclient.ui.theme.SWE_WHITE
+import ru.swe.skywingsexpressclient.ui.util.CalendarModalScreen
+import ru.swe.skywingsexpressclient.ui.util.ModalScreen
+import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchSection(flightFinderViewModel: FlightFinderViewModel) {
+fun SearchSection(navController: NavHostController, flightFinderViewModel: FlightFinderViewModel) {
     Column(
         modifier = Modifier
             .offset(0.dp, (-80).dp)
@@ -110,6 +111,7 @@ fun SearchSection(flightFinderViewModel: FlightFinderViewModel) {
                 bottomStart = 16.dp,
             ),
             onClick = {
+                navController.navigate("flight")
                 flightFinderViewModel.searchFlights()
             },
             modifier = Modifier
