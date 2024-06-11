@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import ru.swe.skywingsexpressclient.BannerSection
+import ru.swe.skywingsexpressclient.InfoCardsSection
+import ru.swe.skywingsexpressclient.R
 import ru.swe.skywingsexpressclient.ui.page.homeScreen.search.SearchSection
 import ru.swe.skywingsexpressclient.ui.theme.SWE_GREY
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
@@ -26,7 +28,7 @@ fun HomeScreen(navController: NavHostController, flightFinderViewModel: FlightFi
     ) {
         BannerSection()
         SearchSection(navController, flightFinderViewModel)
-//        InfoCardsSection("Личный кабинет", "ПОДРОБНЕЕ", R.drawable.ic_lc)
+        InfoCardsSection("Личный кабинет", "ПОДРОБНЕЕ", R.drawable.ic_lc, "lc", navController)
 //        InfoCardsSection("Онлайн-табло", "ПОДРОБНЕЕ", R.drawable.ic_online_table)
     }
 }

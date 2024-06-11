@@ -1,10 +1,14 @@
 package ru.swe.skywingsexpressclient
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,11 +33,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import ru.swe.skywingsexpressclient.ui.navigation.NavigationGraph
 import ru.swe.skywingsexpressclient.ui.theme.SWE_BLUE
 import ru.swe.skywingsexpressclient.ui.theme.SWE_GREY
@@ -41,41 +51,71 @@ import ru.swe.skywingsexpressclient.ui.theme.SWE_LIGHT_BLUE
 import ru.swe.skywingsexpressclient.ui.theme.SWE_WHITE
 import ru.swe.skywingsexpressclient.ui.theme.SkyWingsExpressClientTheme
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
+import ru.swe.skywingsexpressclient.viewmodel.ProfileViewModel
 import ru.swe.skywingsexpressclient.viewmodel.factories.AppViewModelProvider
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SkyWingsExpressClientTheme {
-                val flightFinderViewModel: FlightFinderViewModel = viewModel(factory = AppViewModelProvider.Factory)
-                MyApp(flightFinderViewModel)
+                val flightFinderViewModel: FlightFinderViewModel =
+                    viewModel(factory = AppViewModelProvider.Factory)
+                val profileViewModel: ProfileViewModel =
+                    viewModel(factory = AppViewModelProvider.Factory)
+
+                val context = LocalContext.current
+
+                // Регистрация результата для Google Sign-In
+                val signInLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.StartActivityForResult()
+                ) { result ->
+                    if (result.resultCode == RESULT_OK) {
+                        val data: Intent? = result.data
+                        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+                        handleSignInResult(task, profileViewModel)
+                    } else {
+                        // Показать сообщение об отмене входа через Google
+                        Toast.makeText(context, "Вход через Google был отменен", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                profileViewModel.setSignInLauncher(signInLauncher)
+
+                MaterialTheme {
+                    Scaffold(
+                        topBar = { TopBar() }
+                    ) {
+                        val navController = rememberNavController()
+                        NavigationGraph(
+                            navController = navController,
+                            flightFinderViewModel,
+                            profileViewModel
+                        )
+                    }
+                }
             }
         }
     }
 }
-
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun MyApp(flightFinderViewModel: FlightFinderViewModel) {
-    MaterialTheme {
-        Scaffold(
-            topBar = { TopBar() }
-        ) {
-            MainContent(flightFinderViewModel)
+private fun handleSignInResult(task: Task<GoogleSignInAccount>, profileViewModel: ProfileViewModel) {
+    try {
+        val account = task.getResult(ApiException::class.java)
+        val accessToken = account.serverAuthCode
+        if (accessToken != null) {
+            profileViewModel.getAccessToken(accessToken)
+            profileViewModel.tokenAccess.value?.let { profileViewModel.sendGoogleTokenToServer(it) }
         }
+    } catch (e: ApiException) {
+        // Обработка ошибки входа
+        e.printStackTrace()
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnrememberedMutableState")
-@Composable
-fun MainContent(flightFinderViewModel: FlightFinderViewModel) {
-    val navController = rememberNavController()
-    NavigationGraph(navController = navController, flightFinderViewModel)
-}
+
+
 
 @Composable
 fun TopBar() {
@@ -133,7 +173,9 @@ fun BannerSection() {
 fun InfoCardsSection(
     title: String,
     description: String,
-    imgId: Int
+    imgId: Int,
+    route: String,
+    navController: NavHostController
 ) {
     Row(
         modifier = Modifier
@@ -159,6 +201,9 @@ fun InfoCardsSection(
             )
             Spacer(modifier = Modifier.padding(30.dp))
             Text(
+                modifier = Modifier.clickable {
+                    navController.navigate(route)
+                },
                 text = description,
                 color = SWE_LIGHT_BLUE,
                 fontWeight = FontWeight.Bold,

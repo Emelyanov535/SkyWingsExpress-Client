@@ -5,11 +5,19 @@ import androidx.annotation.RequiresApi
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 import ru.swe.skywingsexpressclient.data.models.FlightsDto
+import ru.swe.skywingsexpressclient.data.models.GoogleTokenResponse
+import ru.swe.skywingsexpressclient.data.models.SignInDto
+import ru.swe.skywingsexpressclient.data.models.TokenResponse
 import ru.swe.skywingsexpressclient.ui.util.LocalDateTimeAdapter
 import java.time.LocalDateTime
 
@@ -24,6 +32,15 @@ interface BackendService {
         @Query("toDate") toDate: String?,
     ) : FlightsDto
 
+    @POST("signin")
+    suspend fun getToken(
+        @Body signIn: SignInDto
+    ) : TokenResponse
+
+    @POST("google")
+    suspend fun sendGoogleToken(
+        @Body token: String
+    ) : TokenResponse
 
     companion object {
         private const val BASE_URL = "http://10.0.2.2:8081/api/v1/"
