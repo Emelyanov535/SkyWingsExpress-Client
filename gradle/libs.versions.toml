@@ -13,7 +13,8 @@ retrofit = "2.9.0"
 logging = "4.11.0"
 json = "2.9.0"
 jakewharton = "1.0.0"
-auth = "19.2.0"
+auth = "21.2.0"
+qr-code = "2.6.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ squareup-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor
 squareup-serialization = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "json"}
 jakewharton-retrofit = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "jakewharton"}
 google-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "auth"}
+qr-code = { group = "com.github.kenglxn.QRGen", name = "android", version.ref = "qr-code"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

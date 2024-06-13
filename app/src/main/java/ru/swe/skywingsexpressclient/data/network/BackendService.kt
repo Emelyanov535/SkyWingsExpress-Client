@@ -12,16 +12,45 @@ import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
 import ru.swe.skywingsexpressclient.data.models.FlightsDto
 import ru.swe.skywingsexpressclient.data.models.GoogleTokenResponse
 import ru.swe.skywingsexpressclient.data.models.SignInDto
+import ru.swe.skywingsexpressclient.data.models.SignInWithOtp
+import ru.swe.skywingsexpressclient.data.models.SignUpDto
 import ru.swe.skywingsexpressclient.data.models.TokenResponse
 import ru.swe.skywingsexpressclient.ui.util.LocalDateTimeAdapter
 import java.time.LocalDateTime
 
 interface BackendService {
+
+    //PROFILE
+    @POST("auth/signUp")
+    suspend fun signUp(
+        @Body signUp: SignUpDto
+    )
+
+    @POST("auth/signIn")
+    suspend fun getToken(
+        @Body signIn: SignInDto
+    ) : TokenResponse
+
+    @POST("auth/signInWithOtp")
+    suspend fun getTokenWithOtp(
+        @Body signIn: SignInWithOtp
+    ) : TokenResponse
+
+    @POST("auth/checkUserOnOtp")
+    suspend fun checkUserOnOtp(
+        @Body signIn: SignInDto
+    ) : Boolean
+
+    @POST("google")
+    suspend fun sendGoogleToken(
+        @Body token: String
+    ) : TokenResponse
 
     //FLIGHT
     @GET("flights/search")
@@ -31,16 +60,6 @@ interface BackendService {
         @Query("fromDate") fromDate: String,
         @Query("toDate") toDate: String?,
     ) : FlightsDto
-
-    @POST("signin")
-    suspend fun getToken(
-        @Body signIn: SignInDto
-    ) : TokenResponse
-
-    @POST("google")
-    suspend fun sendGoogleToken(
-        @Body token: String
-    ) : TokenResponse
 
     companion object {
         private const val BASE_URL = "http://10.0.2.2:8081/api/v1/"

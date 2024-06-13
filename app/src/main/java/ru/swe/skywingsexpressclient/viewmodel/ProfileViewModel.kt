@@ -17,21 +17,116 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.swe.skywingsexpressclient.data.repository.ProfileRepo
+import ru.swe.skywingsexpressclient.data.utils.PreferencesManager
+import android.app.Application
+import ru.swe.skywingsexpressclient.data.models.SignUpDto
+import ru.swe.skywingsexpressclient.data.models.TwoFaDto
+import ru.swe.skywingsexpressclient.data.models.responseFor2FA
+import ru.swe.skywingsexpressclient.data.network.AuthService
 
+class ProfileViewModel(application: Application, private val profileRepository: ProfileRepo) : ViewModel() {
 
-class ProfileViewModel(private val profileRepository: ProfileRepo) : ViewModel() {
+    private val preferencesManager: PreferencesManager = PreferencesManager(application)
     var email by mutableStateOf("")
     var password by mutableStateOf("")
-    @SuppressLint("StaticFieldLeak")
-    private lateinit var activity: Activity
 
-    private lateinit var gso: GoogleSignInOptions
-    private lateinit var mGoogleSignInClient: GoogleSignInClient
-    private lateinit var signInLauncher: ActivityResultLauncher<Intent>
+    var regEmail by mutableStateOf("")
+    var regPassword by mutableStateOf("")
+    var regName by mutableStateOf("")
+    var regSurname by mutableStateOf("")
 
     private var _tokenAccess = MutableStateFlow<String?>(null)
     val tokenAccess: StateFlow<String?> = _tokenAccess.asStateFlow()
 
+    private var _twoFactorCode = MutableStateFlow<TwoFaDto?>(null)
+    val twoFactorCode: StateFlow<TwoFaDto?> = _twoFactorCode.asStateFlow()
+
+    var confirmCode by mutableStateOf("")
+
+    var showTwoFactorDialog by mutableStateOf(false)
+        private set
+
+    var checkShowTwoFactorDialog by mutableStateOf(false)
+        private set
+    fun register() = viewModelScope.launch {
+        val data = SignUpDto(
+            regEmail,
+            regPassword,
+            regName,
+            regSurname
+        )
+        profileRepository.register(data)
+    }
+
+    fun checkUserOnOtp() = viewModelScope.launch {
+        profileRepository.checkUserOnOtp(email, password).collect { res ->
+            checkShowTwoFactorDialog = res
+            if (!res) getToken()
+        }
+    }
+
+    fun getTokenWithOtp() = viewModelScope.launch {
+        profileRepository.getTokenWithOtp(email, password, confirmCode).collect { res ->
+            preferencesManager.saveAccessToken(res.accessToken)
+            preferencesManager.saveRefreshToken(res.refreshToken)
+            _tokenAccess.value = res.accessToken
+        }
+    }
+    fun getToken() = viewModelScope.launch {
+        profileRepository.getToken(email, password).collect { res ->
+            preferencesManager.saveAccessToken(res.accessToken)
+            preferencesManager.saveRefreshToken(res.refreshToken)
+            _tokenAccess.value = res.accessToken
+        }
+    }
+
+    fun loadAccessToken() {
+        val token = preferencesManager.getAccessToken()
+        _tokenAccess.value = token
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            preferencesManager.clearTokens()
+            _tokenAccess.value = null
+        }
+    }
+
+    fun getTwoFactorQrCode() = viewModelScope.launch {
+        val code = profileRepository.generateTwoFactorCode().collect { res ->
+            _twoFactorCode.value = res
+            showTwoFactorDialog = true
+        }
+    }
+
+    fun confirmTwoFactorAuthCode() = viewModelScope.launch {
+        val data = responseFor2FA(
+            confirmCode,
+            _twoFactorCode.value!!.encodedTotpSecret
+        )
+        profileRepository.submitTwoFactorCode(data)
+        confirmCode = ""
+    }
+
+    fun dismissTwoFactorDialog() {
+        showTwoFactorDialog = false
+    }
+
+    fun dismissTwoFactorDialogCode() {
+        checkShowTwoFactorDialog = false
+    }
+
+    //GOOGLE
+    @SuppressLint("StaticFieldLeak")
+    private lateinit var activity: Activity
+    private lateinit var gso: GoogleSignInOptions
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var signInLauncher: ActivityResultLauncher<Intent>
+    fun getAccessToken(token: String) = viewModelScope.launch{
+        profileRepository.getAccessToken(token).collect{
+            token -> _tokenAccess.value = token
+        }
+    }
     fun setActivity(activity: Activity) {
         this.activity = activity
         gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -42,20 +137,9 @@ class ProfileViewModel(private val profileRepository: ProfileRepo) : ViewModel()
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(activity, gso)
     }
-
     fun setSignInLauncher(launcher: ActivityResultLauncher<Intent>) {
         this.signInLauncher = launcher
     }
-
-    fun getToken() = viewModelScope.launch {
-        val res = profileRepository.getToken(email, password)
-    }
-
-    fun signInWithGoogle() {
-        val signInIntent = mGoogleSignInClient.signInIntent
-        signInLauncher.launch(signInIntent)
-    }
-
     fun sendGoogleTokenToServer(tokenAccess: String) = viewModelScope.launch {
         try {
             val response = profileRepository.getGoogleToken(tokenAccess)
@@ -64,10 +148,8 @@ class ProfileViewModel(private val profileRepository: ProfileRepo) : ViewModel()
             e.printStackTrace()
         }
     }
-
-    fun getAccessToken(token: String) = viewModelScope.launch{
-        profileRepository.getAccessToken(token).collect{
-            token -> _tokenAccess.value = token
-        }
+    fun signInWithGoogle() {
+        val signInIntent = mGoogleSignInClient.signInIntent
+        signInLauncher.launch(signInIntent)
     }
 }

@@ -9,6 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import ru.swe.skywingsexpressclient.ui.page.flightScreen.FindFlightScreen
 import ru.swe.skywingsexpressclient.ui.page.homeScreen.HomeScreen
+import ru.swe.skywingsexpressclient.ui.page.profileScreen.AuthScreen
+import ru.swe.skywingsexpressclient.ui.page.profileScreen.SignUpScreen
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import ru.swe.skywingsexpressclient.viewmodel.ProfileViewModel
 
@@ -29,7 +31,10 @@ fun NavigationGraph(navController: NavHostController,
             FindFlightScreen(navController, flightFinderViewModel)
         }
         composable(NavItem.Lc.route) {
-            SignInScreen(profileViewModel)
+            AuthScreen(profileViewModel, navController)
+        }
+        composable(NavItem.Register.route) {
+            SignUpScreen(profileViewModel, navController)
         }
     }
 }

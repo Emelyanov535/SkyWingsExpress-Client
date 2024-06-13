@@ -14,7 +14,7 @@ object AppViewModelProvider {
             FlightFinderViewModel(app().container.flightRepo)
         }
         initializer {
-            ProfileViewModel(app().container.profileRepo)
+            ProfileViewModel(app(), app().container.profileRepo)
         }
     }
 }
