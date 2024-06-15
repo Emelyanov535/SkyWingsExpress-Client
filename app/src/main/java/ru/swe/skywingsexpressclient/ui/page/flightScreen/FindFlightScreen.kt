@@ -33,7 +33,12 @@ fun FindFlightScreen(navController: NavHostController, flightFinderViewModel: Fl
     ) {
         flights?.let { flightsDto ->
             getFlightPairs(flightsDto).forEach { flightPair ->
-                FlightCard(flightDeparture = flightPair.departureFlight, flightArrival = flightPair.returnFlight)
+                FlightCard(
+                    flightDeparture = flightPair.departureFlight,
+                    flightArrival = flightPair.returnFlight,
+                    navController = navController,
+                    flightFinderViewModel = flightFinderViewModel
+                    )
             }
         }
     }

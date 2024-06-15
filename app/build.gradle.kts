@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.ir.backend.js.compile
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -63,6 +64,11 @@ dependencies {
     implementation(libs.squareup.logging)
     implementation(libs.squareup.serialization)
     implementation(libs.jakewharton.retrofit)
+    implementation(libs.androidx.material)
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.jwt.decode)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

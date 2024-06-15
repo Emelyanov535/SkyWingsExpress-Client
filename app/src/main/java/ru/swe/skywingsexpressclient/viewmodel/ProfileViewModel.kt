@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import ru.swe.skywingsexpressclient.data.repository.ProfileRepo
 import ru.swe.skywingsexpressclient.data.utils.PreferencesManager
 import android.app.Application
+import com.auth0.android.jwt.JWT
 import ru.swe.skywingsexpressclient.data.models.SignUpDto
 import ru.swe.skywingsexpressclient.data.models.TwoFaDto
 import ru.swe.skywingsexpressclient.data.models.responseFor2FA
@@ -48,6 +49,10 @@ class ProfileViewModel(application: Application, private val profileRepository: 
 
     var checkShowTwoFactorDialog by mutableStateOf(false)
         private set
+
+    init {
+        loadAccessToken()
+    }
     fun register() = viewModelScope.launch {
         val data = SignUpDto(
             regEmail,
@@ -71,6 +76,7 @@ class ProfileViewModel(application: Application, private val profileRepository: 
             preferencesManager.saveRefreshToken(res.refreshToken)
             _tokenAccess.value = res.accessToken
         }
+        cleanCredential()
     }
     fun getToken() = viewModelScope.launch {
         profileRepository.getToken(email, password).collect { res ->
@@ -78,6 +84,19 @@ class ProfileViewModel(application: Application, private val profileRepository: 
             preferencesManager.saveRefreshToken(res.refreshToken)
             _tokenAccess.value = res.accessToken
         }
+        cleanCredential()
+    }
+
+    private fun cleanCredential(){
+        email = ""
+        password = ""
+        confirmCode = ""
+    }
+
+    fun extractEmailFromToken() : String {
+        val jwt = JWT(preferencesManager.getAccessToken()!!)
+        val emailFromToken = jwt.getClaim("email").asString()
+        return emailFromToken!!
     }
 
     fun loadAccessToken() {
@@ -140,14 +159,14 @@ class ProfileViewModel(application: Application, private val profileRepository: 
     fun setSignInLauncher(launcher: ActivityResultLauncher<Intent>) {
         this.signInLauncher = launcher
     }
-    fun sendGoogleTokenToServer(tokenAccess: String) = viewModelScope.launch {
-        try {
-            val response = profileRepository.getGoogleToken(tokenAccess)
-            println(response)
-        } catch (e: Exception) {
-            e.printStackTrace()
+    fun sendGoogleTokenToServer(token: String) = viewModelScope.launch {
+        profileRepository.getGoogleToken(token).collect{res ->
+            preferencesManager.saveAccessToken(res.accessToken)
+            preferencesManager.saveRefreshToken(res.refreshToken)
+            _tokenAccess.value = res.accessToken
         }
     }
+
     fun signInWithGoogle() {
         val signInIntent = mGoogleSignInClient.signInIntent
         signInLauncher.launch(signInIntent)

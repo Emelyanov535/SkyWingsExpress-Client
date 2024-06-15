@@ -7,8 +7,8 @@ data class FlightPair(
 
 fun getFlightPairs(flightsDto: FlightsDto): List<FlightPair> {
     val flightPairs = mutableListOf<FlightPair>()
-    val departureFlights = flightsDto.departureFlights
-    val returnFlights = flightsDto.returnFlights
+    val departureFlights = flightsDto.departureFlights.orEmpty()
+    val returnFlights = flightsDto.returnFlights.orEmpty()
 
     if (departureFlights.isNotEmpty()) {
         departureFlights.forEach { departure ->
@@ -21,6 +21,7 @@ fun getFlightPairs(flightsDto: FlightsDto): List<FlightPair> {
             }
         }
     }
-
     return flightPairs
 }
+
+

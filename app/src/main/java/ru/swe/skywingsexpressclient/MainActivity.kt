@@ -26,9 +26,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,11 +42,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import ru.swe.skywingsexpressclient.ui.navigation.NavItem
 import ru.swe.skywingsexpressclient.ui.navigation.NavigationGraph
 import ru.swe.skywingsexpressclient.ui.theme.SWE_BLUE
 import ru.swe.skywingsexpressclient.ui.theme.SWE_GREY
@@ -83,12 +88,12 @@ class MainActivity : ComponentActivity() {
                 }
 
                 profileViewModel.setSignInLauncher(signInLauncher)
-
+                val navController = rememberNavController()
                 MaterialTheme {
                     Scaffold(
-                        topBar = { TopBar() }
+                        topBar = { TopBar() },
+                        bottomBar = { BottomBar(navController = navController) }
                     ) {
-                        val navController = rememberNavController()
                         NavigationGraph(
                             navController = navController,
                             flightFinderViewModel,
@@ -114,6 +119,35 @@ private fun handleSignInResult(task: Task<GoogleSignInAccount>, profileViewModel
     }
 }
 
+@Composable
+fun BottomBar(navController: NavHostController){
+    val items = listOf(
+        NavItem.Home,
+        NavItem.Ticket,
+        NavItem.Lc
+    )
+    NavigationBar(
+        modifier = Modifier.height(64.dp),
+        containerColor = SWE_GREY
+    ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        items.forEach { item ->
+            NavigationBarItem(
+                icon = { Icon(item.image!!, contentDescription = null) },
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
 
 
 

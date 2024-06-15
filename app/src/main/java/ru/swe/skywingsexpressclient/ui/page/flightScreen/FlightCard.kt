@@ -8,19 +8,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,11 +34,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import ru.swe.skywingsexpressclient.R
 import ru.swe.skywingsexpressclient.data.models.Flight
+import ru.swe.skywingsexpressclient.ui.navigation.flightsToScreen
 import ru.swe.skywingsexpressclient.ui.theme.SWE_GREY
-import ru.swe.skywingsexpressclient.ui.theme.SWE_RED
 import ru.swe.skywingsexpressclient.ui.theme.SWE_WHITE
+import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -47,13 +49,13 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
+fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: NavHostController, flightFinderViewModel: FlightFinderViewModel) {
     val departureTime = flightDeparture.departureTime?.let {
         LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("HH:mm", Locale("ru")))
     } ?: "N/A"
 
     val departureDate = flightDeparture.departureTime?.let {
-        LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("d MMMM",  Locale("ru")))
+        LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("d MMMM", Locale("ru")))
     } ?: "N/A"
 
     val arrivalTime = flightDeparture.arrivalTime?.let {
@@ -61,7 +63,7 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
     } ?: "N/A"
 
     val arrivalDate = flightDeparture.arrivalTime?.let {
-        LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("d MMMM",  Locale("ru")))
+        LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("d MMMM", Locale("ru")))
     } ?: "N/A"
 
     val duration = Duration.between(LocalDateTime.parse(flightDeparture.departureTime.toString()), LocalDateTime.parse(flightDeparture.arrivalTime.toString()))
@@ -71,9 +73,10 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
 
     var showModal by remember { mutableStateOf(false) }
     var showModal1 by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.padding(8.dp)
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -88,7 +91,7 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
             ) {
                 Text(
                     text = "${
-                        if(flightArrival == null){
+                        if (flightArrival == null) {
                             flightDeparture.ticketPrice
                         } else {
                             flightDeparture.ticketPrice?.plus(flightArrival.ticketPrice!!)
@@ -131,9 +134,11 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
             //РЕЙС ТУДА
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(0.dp, 16.dp).clickable {
-                    showModal = true
-                }
+                modifier = Modifier
+                    .padding(0.dp, 16.dp)
+                    .clickable {
+                        showModal = true
+                    }
             ) {
                 Column {
                     Text(
@@ -171,13 +176,13 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
                 }
             }
             //РЕЙС ОБРАТНО
-            if(flightArrival != null){
+            if (flightArrival != null) {
                 val departureTime1 = flightArrival.departureTime?.let {
                     LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("HH:mm", Locale("ru")))
                 } ?: "N/A"
 
                 val departureDate1 = flightArrival.departureTime?.let {
-                    LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("d MMMM",  Locale("ru")))
+                    LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("d MMMM", Locale("ru")))
                 } ?: "N/A"
 
                 val arrivalTime1 = flightArrival.arrivalTime?.let {
@@ -185,7 +190,7 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
                 } ?: "N/A"
 
                 val arrivalDate1 = flightArrival.arrivalTime?.let {
-                    LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("d MMMM",  Locale("ru")))
+                    LocalDateTime.parse(it.toString()).format(DateTimeFormatter.ofPattern("d MMMM", Locale("ru")))
                 } ?: "N/A"
 
                 val duration1 = Duration.between(LocalDateTime.parse(flightArrival.departureTime.toString()), LocalDateTime.parse(flightArrival.arrivalTime.toString()))
@@ -194,9 +199,11 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
                 val durationText1 = "${hours1}ч ${minutes1}м"
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(0.dp, 16.dp).clickable {
-                        showModal1 = true
-                    }
+                    modifier = Modifier
+                        .padding(0.dp, 16.dp)
+                        .clickable {
+                            showModal1 = true
+                        }
                 ) {
                     Column {
                         Text(
@@ -234,23 +241,20 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
                     }
                 }
             }
-
-            Row(){
-                Button(
-                    shape = RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomEnd = 16.dp,
-                        bottomStart = 16.dp,
-                    ),
-                    onClick = {
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor  = SWE_RED)
-                ) {
-                    Text(text = "КУПИТЬ", color = SWE_WHITE)
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = {
+                    val list = listOf(flightArrival, flightDeparture)
+                    val listFlightsIds = ArrayList<String>()
+                    list.forEach{
+                        listFlightsIds.add(it?.id.toString())
+                    }
+                    navController.navigate(flightsToScreen(listFlightsIds))
+                }) {
+                    Text(text = "Buy", fontSize = 18.sp)
                 }
             }
         }
@@ -268,3 +272,7 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?) {
         }
     }
 }
+
+
+
+

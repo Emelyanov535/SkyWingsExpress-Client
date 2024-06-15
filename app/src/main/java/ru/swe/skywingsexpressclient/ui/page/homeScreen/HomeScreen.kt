@@ -28,7 +28,5 @@ fun HomeScreen(navController: NavHostController, flightFinderViewModel: FlightFi
     ) {
         BannerSection()
         SearchSection(navController, flightFinderViewModel)
-        InfoCardsSection("Личный кабинет", "ПОДРОБНЕЕ", R.drawable.ic_lc, "lc", navController)
-//        InfoCardsSection("Онлайн-табло", "ПОДРОБНЕЕ", R.drawable.ic_online_table)
     }
 }
