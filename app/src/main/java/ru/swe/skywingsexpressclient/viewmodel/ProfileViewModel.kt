@@ -20,6 +20,7 @@ import ru.swe.skywingsexpressclient.data.repository.ProfileRepo
 import ru.swe.skywingsexpressclient.data.utils.PreferencesManager
 import android.app.Application
 import com.auth0.android.jwt.JWT
+import ru.swe.skywingsexpressclient.data.models.AuthGoogleDto
 import ru.swe.skywingsexpressclient.data.models.SignUpDto
 import ru.swe.skywingsexpressclient.data.models.TwoFaDto
 import ru.swe.skywingsexpressclient.data.models.responseFor2FA
@@ -160,7 +161,7 @@ class ProfileViewModel(application: Application, private val profileRepository: 
         this.signInLauncher = launcher
     }
     fun sendGoogleTokenToServer(token: String) = viewModelScope.launch {
-        profileRepository.getGoogleToken(token).collect{res ->
+        profileRepository.getGoogleToken(AuthGoogleDto(token)).collect{ res ->
             preferencesManager.saveAccessToken(res.accessToken)
             preferencesManager.saveRefreshToken(res.refreshToken)
             _tokenAccess.value = res.accessToken

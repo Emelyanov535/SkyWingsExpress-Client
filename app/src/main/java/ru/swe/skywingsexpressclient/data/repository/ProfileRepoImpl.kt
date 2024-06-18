@@ -3,6 +3,7 @@ package ru.swe.skywingsexpressclient.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import retrofit2.HttpException
+import ru.swe.skywingsexpressclient.data.models.AuthGoogleDto
 import ru.swe.skywingsexpressclient.data.models.SignInDto
 import ru.swe.skywingsexpressclient.data.models.SignInWithOtp
 import ru.swe.skywingsexpressclient.data.models.SignUpDto
@@ -30,7 +31,7 @@ class ProfileRepoImpl(
         return flowOf(service.getTokenWithOtp(SignInWithOtp(email, password, otp)))
     }
 
-    override suspend fun getGoogleToken(accessToken: String): Flow<TokenResponse> {
+    override suspend fun getGoogleToken(accessToken: AuthGoogleDto): Flow<TokenResponse> {
         return flowOf(service.sendGoogleToken(accessToken))
     }
 

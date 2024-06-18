@@ -1,7 +1,6 @@
 package ru.swe.skywingsexpressclient.ui.page.flightScreen
 
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,8 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,19 +50,20 @@ import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getD
 import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getTime
 import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getTimeBetween
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
+import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: NavHostController) {
+fun FlighConnectingCard(flightDeparture: List<Flight>, flightArrival: List<Flight>?, navController: NavHostController) {
 
     var selectedFlight by remember { mutableStateOf<Flight?>(null) }
-    val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
 
     Card(
         modifier = Modifier.padding(8.dp)
@@ -85,9 +83,9 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: N
                 Text(
                     text = "${
                         if (flightArrival == null) {
-                            flightDeparture.ticketPrice
+                            flightDeparture.sumOf { it.ticketPrice ?: BigDecimal.ZERO }
                         } else {
-                            flightDeparture.ticketPrice?.plus(flightArrival.ticketPrice!!)
+                            (flightDeparture.sumOf { it.ticketPrice ?: BigDecimal.ZERO } + flightArrival.sumOf { it.ticketPrice ?: BigDecimal.ZERO })
                         }
                     } ₽",
                     modifier = Modifier.weight(1f),
@@ -110,13 +108,7 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: N
                         )
                     }
                     Card(
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .clickable {
-                                val textToCopy = "https://example.com/flight/${flightDeparture.id}"
-                                clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(textToCopy))
-                                Toast.makeText(context, "Ссылка скопирована в буфер обмена", Toast.LENGTH_SHORT).show()
-                            }
+                        modifier = Modifier.padding(5.dp)
                     ) {
                         Icon(
                             modifier = Modifier
@@ -130,9 +122,11 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: N
                     }
                 }
             }
-            FlightInfoRow(flight = flightDeparture, onClick = { selectedFlight = flightDeparture })
-            if (flightArrival != null) {
-                FlightInfoRow(flight = flightArrival, onClick = { selectedFlight = flightArrival })
+            flightDeparture.forEach{ flight ->
+                FlightInfoRow(flight = flight, onClick = { selectedFlight = flight })
+            }
+            flightArrival?.forEach{ flight ->
+                FlightInfoRow(flight = flight, onClick = { selectedFlight = flight })
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
@@ -143,12 +137,12 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: N
                     bottomStart = 16.dp,
                 ),
                 onClick = {
-                    val list = listOf(flightArrival, flightDeparture)
-                    val listFlightsIds = ArrayList<String>()
-                    list.forEach{
-                        listFlightsIds.add(it?.id.toString())
-                    }
-                    navController.navigate(flightsToScreen(listFlightsIds))
+//                    val list = listOf(flightArrival, flightDeparture)
+//                    val listFlightsIds = ArrayList<String>()
+//                    list.forEach{
+//                        listFlightsIds.add(it?.id.toString())
+//                    }
+//                    navController.navigate(flightsToScreen(listFlightsIds))
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -166,72 +160,3 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: N
         }
     }
 }
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun FlightInfoRow(flight: Flight, onClick: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(0.dp, 16.dp)
-            .clickable(onClick = onClick)
-    ) {
-        Column {
-            Text(
-                text = getTime(flight.departureTime!!),
-                fontSize = 24.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(text = getDate(flight.departureTime))
-            Text(text = flight.route.origin)
-        }
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Divider(color = Color.Black, thickness = 2.dp)
-            Text(
-                text = getTimeBetween(flight.departureTime!!, flight.arrivalTime!!),
-                modifier = Modifier
-                    .background(Color.White)
-                    .padding(horizontal = 4.dp)
-            )
-        }
-        Column {
-            Text(
-                text = getTime(flight.arrivalTime!!),
-                fontSize = 24.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(text = getDate(flight.arrivalTime))
-            Text(text = flight.route.destination)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if(flight.priceChangePercentage != null){
-                    if (flight.priceChangePercentage > 0) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowUp,
-                            contentDescription = "Price Increase",
-                            tint = Color.Green
-                        )
-                        Text(text = "+${flight.priceChangePercentage}%")
-                    } else if (flight.priceChangePercentage < 0) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Price Decrease",
-                            tint = Color.Red
-                        )
-                        Text(text = "${flight.priceChangePercentage}%")
-                    }
-                }
-
-            }
-        }
-    }
-}
-
-
-

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import ru.swe.skywingsexpressclient.App
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import ru.swe.skywingsexpressclient.viewmodel.ProfileViewModel
+import ru.swe.skywingsexpressclient.viewmodel.TicketViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -15,6 +16,9 @@ object AppViewModelProvider {
         }
         initializer {
             ProfileViewModel(app(), app().container.profileRepo)
+        }
+        initializer {
+            TicketViewModel(app().container.ticketRepo)
         }
     }
 }

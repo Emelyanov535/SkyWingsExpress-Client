@@ -62,7 +62,7 @@ fun SeatSelectionScreen(flightId: Long, flightFinderViewModel: FlightFinderViewM
                                         flightFinderViewModel.removeSeat(Seat(seat.seatNumber, seat.isAvailible))
                                     }
                                 },
-                                enabled = seat.isAvailible,
+                                enabled = seat.isAvailible!!,
                                 modifier = Modifier.size(40.dp) // Optional: Adjust size if needed
                             )
                         }

@@ -15,9 +15,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import ru.swe.skywingsexpressclient.InfoCardsSection
-import ru.swe.skywingsexpressclient.R
-import ru.swe.skywingsexpressclient.ui.page.MyTicketScreen
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 
 @Composable
@@ -42,7 +39,7 @@ fun FlightScreen(flightsIds: List<String>, flightFinderViewModel: FlightFinderVi
                 Text(text = "${currentFlight.route.origin} ----> ${currentFlight.route.destination}")
                 Button(onClick = {
                     // Сохраняем выбранные места для текущего рейса
-                    flightFinderViewModel.selectSeats(currentFlight.id, flightFinderViewModel.selectedSeats.value)
+                    flightFinderViewModel.selectSeats(currentFlight, listOf(flightFinderViewModel.selectedSeats.value.last()))
 
                     // Переходим к следующему рейсу
                     currentIndex++
@@ -50,7 +47,7 @@ fun FlightScreen(flightsIds: List<String>, flightFinderViewModel: FlightFinderVi
                     // Если это был последний рейс, можно выполнить какие-то действия,
                     // например, переход на экран с финальной информацией
                     if (currentIndex >= flightList.size) {
-//                        navController.navigate("buy")
+                        navController.navigate("buy")
                     }
                 }) {
                     Text(text = "Next Flight")

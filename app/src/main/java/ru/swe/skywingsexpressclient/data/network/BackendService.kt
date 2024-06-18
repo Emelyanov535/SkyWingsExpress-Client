@@ -16,6 +16,8 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import ru.swe.skywingsexpressclient.data.models.AuthGoogleDto
+import ru.swe.skywingsexpressclient.data.models.ConnectingFlightDto
 import ru.swe.skywingsexpressclient.data.models.Flight
 import ru.swe.skywingsexpressclient.data.models.FlightsDto
 import ru.swe.skywingsexpressclient.data.models.GoogleTokenResponse
@@ -52,7 +54,7 @@ interface BackendService {
 
     @POST("google")
     suspend fun sendGoogleToken(
-        @Body token: String
+        @Body token: AuthGoogleDto
     ) : TokenResponse
 
     //FLIGHT
@@ -63,6 +65,14 @@ interface BackendService {
         @Query("fromDate") fromDate: String,
         @Query("toDate") toDate: String?,
     ) : FlightsDto
+
+    @GET("flights/connecting-flights")
+    suspend fun getConnectingFlights(
+        @Query("from") from: String,
+        @Query("to") to: String,
+        @Query("fromDate") fromDate: String,
+        @Query("toDate") toDate: String?,
+    ) : ConnectingFlightDto
 
     //GetTicketOnFlight
 

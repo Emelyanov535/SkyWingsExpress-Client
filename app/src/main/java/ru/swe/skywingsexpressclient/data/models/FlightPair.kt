@@ -24,4 +24,28 @@ fun getFlightPairs(flightsDto: FlightsDto): List<FlightPair> {
     return flightPairs
 }
 
+data class ConnectingFlightPairs(
+    val departureFlight: List<Flight>,
+    val returnFlight: List<Flight>?
+)
+
+fun getConnectingFlightPairs(connectingFlightDto: ConnectingFlightDto): List<ConnectingFlightPairs> {
+    val connectingFlightPairs = mutableListOf<ConnectingFlightPairs>()
+    val departureFlights = connectingFlightDto.departureFlights.orEmpty()
+    val returnFlights = connectingFlightDto.returnFlights.orEmpty()
+
+    if (departureFlights.isNotEmpty()) {
+        departureFlights.forEach { departure ->
+            if (returnFlights.isNotEmpty()) {
+                returnFlights.forEach { returnFlight ->
+                    connectingFlightPairs.add(ConnectingFlightPairs(departure, returnFlight))
+                }
+            } else {
+                connectingFlightPairs.add(ConnectingFlightPairs(departure, null))
+            }
+        }
+    }
+    return connectingFlightPairs
+}
+
 

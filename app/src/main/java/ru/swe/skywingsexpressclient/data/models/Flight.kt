@@ -10,7 +10,6 @@ data class Flight(
     val id: Long,
     val flightNumber: String,
     val route: Route,
-    val airline: Airline,
     @Contextual
     val departureTime: LocalDateTime? = null,
     @Contextual
@@ -18,7 +17,8 @@ data class Flight(
     val totalSeats: Int? = null,
     val availableSeats: Int? = null,
     @Contextual
-    val ticketPrice: BigDecimal? = null,
+    var ticketPrice: BigDecimal? = null,
     val discountPercentage: Double? = null,
+    val priceChangePercentage: Double? = null
 )
 

@@ -57,6 +57,7 @@ import ru.swe.skywingsexpressclient.ui.theme.SWE_WHITE
 import ru.swe.skywingsexpressclient.ui.theme.SkyWingsExpressClientTheme
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import ru.swe.skywingsexpressclient.viewmodel.ProfileViewModel
+import ru.swe.skywingsexpressclient.viewmodel.TicketViewModel
 import ru.swe.skywingsexpressclient.viewmodel.factories.AppViewModelProvider
 
 class MainActivity : ComponentActivity() {
@@ -69,6 +70,8 @@ class MainActivity : ComponentActivity() {
                 val flightFinderViewModel: FlightFinderViewModel =
                     viewModel(factory = AppViewModelProvider.Factory)
                 val profileViewModel: ProfileViewModel =
+                    viewModel(factory = AppViewModelProvider.Factory)
+                val ticketViewModel: TicketViewModel =
                     viewModel(factory = AppViewModelProvider.Factory)
 
                 val context = LocalContext.current
@@ -97,7 +100,8 @@ class MainActivity : ComponentActivity() {
                         NavigationGraph(
                             navController = navController,
                             flightFinderViewModel,
-                            profileViewModel
+                            profileViewModel,
+                            ticketViewModel
                         )
                     }
                 }

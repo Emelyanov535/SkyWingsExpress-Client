@@ -113,6 +113,7 @@ fun SearchSection(navController: NavHostController, flightFinderViewModel: Fligh
             onClick = {
                 navController.navigate("flight")
                 flightFinderViewModel.searchFlights()
+                flightFinderViewModel.searchConnectingFlight()
             },
             modifier = Modifier
                 .fillMaxWidth()

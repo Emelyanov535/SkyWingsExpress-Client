@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import ru.swe.skywingsexpressclient.data.models.ConnectingFlightDto
 import ru.swe.skywingsexpressclient.data.models.Flight
 import ru.swe.skywingsexpressclient.data.models.FlightsDto
+import ru.swe.skywingsexpressclient.data.models.ReservationDto
 import ru.swe.skywingsexpressclient.data.models.Seat
 import ru.swe.skywingsexpressclient.data.models.SeatsOnFlight
 import ru.swe.skywingsexpressclient.data.repository.FlightRepo
@@ -28,24 +30,40 @@ class FlightFinderViewModel(private val flightRepository: FlightRepo) : ViewMode
     private val _arrivalDate = MutableStateFlow<LocalDate?>(null)
     val arrivalDate: StateFlow<LocalDate?> = _arrivalDate.asStateFlow()
 
-    private val _flights = MutableStateFlow<FlightsDto?>(null)
+    private var _flights = MutableStateFlow<FlightsDto?>(null)
     val flights: StateFlow<FlightsDto?> = _flights.asStateFlow()
 
-    private val _selectedSeats = MutableStateFlow<List<Seat>>(emptyList())
+    private var _connectingFlights = MutableStateFlow<ConnectingFlightDto?>(null)
+    val connectingFlights: StateFlow<ConnectingFlightDto?> = _connectingFlights.asStateFlow()
+
+    private var _selectedSeats = MutableStateFlow<List<Seat>>(emptyList())
     val selectedSeats: StateFlow<List<Seat>> = _selectedSeats.asStateFlow()
 
     // Изменяем тип данных для хранения списка мест
-    private val _seatsOnFlight = MutableStateFlow<SeatsOnFlight?>(null)
+    private var _seatsOnFlight = MutableStateFlow<SeatsOnFlight?>(null)
     val seatsOnFlight: StateFlow<SeatsOnFlight?> = _seatsOnFlight.asStateFlow()
 
-    private val _flight = MutableStateFlow<Flight?>(null)
+    private var _flight = MutableStateFlow<Flight?>(null)
     val flight: StateFlow<Flight?> = _flight.asStateFlow()
 
-    private val _flightConvertedFromId = MutableStateFlow<List<Flight>>(emptyList())
+    private var _flightConvertedFromId = MutableStateFlow<List<Flight>>(emptyList())
     val flightConvertedFromId: StateFlow<List<Flight>> = _flightConvertedFromId.asStateFlow()
 
-    private val selectedSeatsMap = mutableMapOf<Long, List<Seat>>()
+    private var _selectedSeatsMap = MutableStateFlow<Map<Flight, Seat>>(emptyMap())
+    val selectedSeatsMap: StateFlow<Map<Flight, Seat>> = _selectedSeatsMap.asStateFlow()
 
+    fun clearData(){
+        _from.value = ""
+        _to.value = ""
+        _departureDate.value = null
+        _arrivalDate.value = null
+        _flights.value = null
+        _selectedSeats.value = emptyList()
+        _seatsOnFlight.value = null
+        _flight.value = null
+        _flightConvertedFromId.value = emptyList()
+        _selectedSeatsMap.value = emptyMap()
+    }
     fun getFlightConvertedFromId(list: List<String>) {
         viewModelScope.launch {
             val flightsList = mutableListOf<Flight>()
@@ -61,12 +79,10 @@ class FlightFinderViewModel(private val flightRepository: FlightRepo) : ViewMode
         }
     }
 
-    fun getSelectedSeats(flightId: Long): List<Seat> {
-        return selectedSeatsMap[flightId] ?: emptyList()
-    }
-
-    fun selectSeats(flightId: Long, seats: List<Seat>) {
-        selectedSeatsMap[flightId] = seats
+    fun selectSeats(flight: Flight, seats: List<Seat>) {
+        val updatedMap = _selectedSeatsMap.value.toMutableMap()
+        updatedMap[flight] = seats.last()
+        _selectedSeatsMap.value = updatedMap
     }
 
     fun setFrom(from: String) {
@@ -84,11 +100,6 @@ class FlightFinderViewModel(private val flightRepository: FlightRepo) : ViewMode
     fun setArrivalDate(date: LocalDate?) {
         _arrivalDate.value = date
     }
-// fun getFlightById(id: Long) = viewModelScope.launch{
-// flightRepository.getFlightById(id).collect{
-// flight -> _flight.value = flight
-// }
-// }
 
     suspend fun getFlightById(id: Long): Flight {
         val flow: Flow<Flight> = flightRepository.getFlightById(id)
@@ -107,6 +118,18 @@ class FlightFinderViewModel(private val flightRepository: FlightRepo) : ViewMode
             }
     }
 
+    fun searchConnectingFlight() = viewModelScope.launch {
+        val from = _from.value
+        val to = _to.value
+        val fromDate = _departureDate.value.toString()
+        val toDate = _arrivalDate.value.toString()
+
+        flightRepository.getConnectingFlights(from, to, fromDate, toDate)
+            .collect{
+                _connectingFlights.value = it
+            }
+    }
+
     fun fetchSeatsOnFlight(flightId: Long) = viewModelScope.launch {
         flightRepository.getTicketOnFlight(flightId).collect { seatsOnFlight ->
             _seatsOnFlight.value = seatsOnFlight
@@ -120,8 +143,13 @@ class FlightFinderViewModel(private val flightRepository: FlightRepo) : ViewMode
     fun removeSeat(seat: Seat) {
         _selectedSeats.value = _selectedSeats.value - seat
     }
-// fun purchaseTickets() = viewModelScope.launch {
-// val reservation = ReservationDto(_selectedSeats.value.map { it.ticketNumber })
-// seatRepository.purchaseTickets(reservation)
-// }
+    fun buyTickets(list: List<String>) = viewModelScope.launch {
+        flightRepository.buyTickets(ReservationDto(list))
+        clearData()
+    }
+
+    fun reserveTickets(list: List<String>) = viewModelScope.launch {
+        flightRepository.reserveTickets(ReservationDto(list))
+        clearData()
+    }
 }
