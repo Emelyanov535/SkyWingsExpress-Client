@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -49,6 +50,7 @@ import ru.swe.skywingsexpressclient.ui.theme.SWE_WHITE
 import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getDate
 import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getTime
 import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getTimeBetween
+import ru.swe.skywingsexpressclient.viewmodel.FavViewModel
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import java.math.BigDecimal
 import java.time.Duration
@@ -61,7 +63,10 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FlighConnectingCard(flightDeparture: List<Flight>, flightArrival: List<Flight>?, navController: NavHostController) {
+fun FlighConnectingCard(flightDeparture: List<Flight>,
+                        flightArrival: List<Flight>?,
+                        navController: NavHostController,
+                        favViewModel: FavViewModel) {
 
     var selectedFlight by remember { mutableStateOf<Flight?>(null) }
 
@@ -95,7 +100,16 @@ fun FlighConnectingCard(flightDeparture: List<Flight>, flightArrival: List<Fligh
                 )
                 Row() {
                     Card(
-                        modifier = Modifier.padding(5.dp)
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .clickable {
+                                flightDeparture.forEach{
+                                    favViewModel.addToFav(it.id.toString())
+                                }
+                                flightArrival?.forEach{
+                                    favViewModel.addToFav(it.id.toString())
+                                }
+                            }
                     ) {
                         Icon(
                             modifier = Modifier
@@ -103,8 +117,8 @@ fun FlighConnectingCard(flightDeparture: List<Flight>, flightArrival: List<Fligh
                                 .clip(RoundedCornerShape(16.dp))
                                 .padding(5.dp)
                                 .size(30.dp),
-                            painter = painterResource(id = R.drawable.ic_notification),
-                            contentDescription = "notification"
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "favourite"
                         )
                     }
                     Card(

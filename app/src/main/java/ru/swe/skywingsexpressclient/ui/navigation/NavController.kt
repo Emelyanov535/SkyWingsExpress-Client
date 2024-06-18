@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import ru.swe.skywingsexpressclient.ui.page.favouriteScreen.MyFavScreen
 import ru.swe.skywingsexpressclient.ui.page.ticketScreen.MyTicketScreen
 import ru.swe.skywingsexpressclient.ui.page.flightScreen.BuyTicket
 import ru.swe.skywingsexpressclient.ui.page.flightScreen.FindFlightScreen
@@ -15,6 +16,7 @@ import ru.swe.skywingsexpressclient.ui.page.flightScreen.FlightScreen
 import ru.swe.skywingsexpressclient.ui.page.homeScreen.HomeScreen
 import ru.swe.skywingsexpressclient.ui.page.profileScreen.AuthScreen
 import ru.swe.skywingsexpressclient.ui.page.profileScreen.SignUpScreen
+import ru.swe.skywingsexpressclient.viewmodel.FavViewModel
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import ru.swe.skywingsexpressclient.viewmodel.ProfileViewModel
 import ru.swe.skywingsexpressclient.viewmodel.TicketViewModel
@@ -25,7 +27,8 @@ import ru.swe.skywingsexpressclient.viewmodel.TicketViewModel
 fun NavigationGraph(navController: NavHostController,
                     flightFinderViewModel: FlightFinderViewModel,
                     profileViewModel: ProfileViewModel,
-                    ticketViewModel: TicketViewModel
+                    ticketViewModel: TicketViewModel,
+                    favViewModel: FavViewModel
 ) {
     NavHost(
         navController = navController,
@@ -35,7 +38,7 @@ fun NavigationGraph(navController: NavHostController,
             HomeScreen(navController, flightFinderViewModel)
         }
         composable(NavItem.Flight.route) {
-            FindFlightScreen(navController, flightFinderViewModel)
+            FindFlightScreen(navController, flightFinderViewModel, favViewModel)
         }
         composable(NavItem.Lc.route) {
             AuthScreen(profileViewModel, navController)
@@ -45,6 +48,9 @@ fun NavigationGraph(navController: NavHostController,
         }
         composable(NavItem.Ticket.route) {
             MyTicketScreen(ticketViewModel)
+        }
+        composable(NavItem.Favourite.route) {
+            MyFavScreen(favViewModel)
         }
         composable<flightsToScreen> {
             val args = it.toRoute<flightsToScreen>()

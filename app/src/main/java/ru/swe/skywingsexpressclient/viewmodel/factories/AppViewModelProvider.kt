@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import ru.swe.skywingsexpressclient.App
+import ru.swe.skywingsexpressclient.viewmodel.FavViewModel
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import ru.swe.skywingsexpressclient.viewmodel.ProfileViewModel
 import ru.swe.skywingsexpressclient.viewmodel.TicketViewModel
@@ -19,6 +20,9 @@ object AppViewModelProvider {
         }
         initializer {
             TicketViewModel(app().container.ticketRepo)
+        }
+        initializer {
+            FavViewModel(app().container.favRepo)
         }
     }
 }

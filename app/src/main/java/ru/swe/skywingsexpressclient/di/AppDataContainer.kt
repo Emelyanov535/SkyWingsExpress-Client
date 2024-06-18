@@ -6,6 +6,8 @@ import androidx.annotation.RequiresApi
 import ru.swe.skywingsexpressclient.data.network.AuthService
 import ru.swe.skywingsexpressclient.data.network.BackendService
 import ru.swe.skywingsexpressclient.data.network.GoogleAuthService
+import ru.swe.skywingsexpressclient.data.repository.FavRepo
+import ru.swe.skywingsexpressclient.data.repository.FavRepoImpl
 import ru.swe.skywingsexpressclient.data.repository.FlightRepo
 import ru.swe.skywingsexpressclient.data.repository.FlightRepoImpl
 import ru.swe.skywingsexpressclient.data.repository.ProfileRepo
@@ -33,4 +35,10 @@ class AppDataContainer(private val context: Context) : AppContainer {
             AuthService.create(context)
         )
     }
+    override val favRepo: FavRepo by lazy {
+        FavRepoImpl(
+            AuthService.create(context)
+        )
+    }
+
 }

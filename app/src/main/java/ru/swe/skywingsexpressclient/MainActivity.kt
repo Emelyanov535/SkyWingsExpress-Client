@@ -55,6 +55,7 @@ import ru.swe.skywingsexpressclient.ui.theme.SWE_GREY
 import ru.swe.skywingsexpressclient.ui.theme.SWE_LIGHT_BLUE
 import ru.swe.skywingsexpressclient.ui.theme.SWE_WHITE
 import ru.swe.skywingsexpressclient.ui.theme.SkyWingsExpressClientTheme
+import ru.swe.skywingsexpressclient.viewmodel.FavViewModel
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import ru.swe.skywingsexpressclient.viewmodel.ProfileViewModel
 import ru.swe.skywingsexpressclient.viewmodel.TicketViewModel
@@ -73,6 +74,9 @@ class MainActivity : ComponentActivity() {
                     viewModel(factory = AppViewModelProvider.Factory)
                 val ticketViewModel: TicketViewModel =
                     viewModel(factory = AppViewModelProvider.Factory)
+                val favViewModel: FavViewModel =
+                    viewModel(factory = AppViewModelProvider.Factory)
+
 
                 val context = LocalContext.current
 
@@ -101,7 +105,8 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             flightFinderViewModel,
                             profileViewModel,
-                            ticketViewModel
+                            ticketViewModel,
+                            favViewModel
                         )
                     }
                 }
@@ -127,6 +132,7 @@ private fun handleSignInResult(task: Task<GoogleSignInAccount>, profileViewModel
 fun BottomBar(navController: NavHostController){
     val items = listOf(
         NavItem.Home,
+        NavItem.Favourite,
         NavItem.Ticket,
         NavItem.Lc
     )

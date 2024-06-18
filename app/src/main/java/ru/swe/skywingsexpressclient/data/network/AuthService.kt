@@ -15,6 +15,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
+import ru.swe.skywingsexpressclient.data.models.Flight
 import ru.swe.skywingsexpressclient.data.models.ReservationDto
 import ru.swe.skywingsexpressclient.data.models.SignInDto
 import ru.swe.skywingsexpressclient.data.models.TicketDto
@@ -53,6 +55,21 @@ interface AuthService {
     suspend fun checkin(
         @Path("ticketNumber") ticketNumber: String
     )
+
+    //ИЗБРАННОЕ
+    @GET("favorites/add")
+    suspend fun addToFav(
+        @Query("flightId") flightId: String
+    )
+
+    @GET("favorites/remove")
+    suspend fun deleteFromFav(
+        @Query("flightId") flightId: String
+    )
+
+    @GET("favorites")
+    suspend fun getFav() : List<Flight>
+
     companion object {
         private const val BASE_URL = "http://10.0.2.2:8081/api/v1/"
 

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -52,6 +53,7 @@ import ru.swe.skywingsexpressclient.ui.theme.SWE_WHITE
 import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getDate
 import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getTime
 import ru.swe.skywingsexpressclient.ui.util.TimeConverterToPretty.Companion.getTimeBetween
+import ru.swe.skywingsexpressclient.viewmodel.FavViewModel
 import ru.swe.skywingsexpressclient.viewmodel.FlightFinderViewModel
 import java.time.Duration
 import java.time.LocalDateTime
@@ -61,7 +63,11 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: NavHostController) {
+fun FlightCard(flightDeparture: Flight,
+               flightArrival: Flight?,
+               navController: NavHostController,
+               favViewModel: FavViewModel
+) {
 
     var selectedFlight by remember { mutableStateOf<Flight?>(null) }
     val context = LocalContext.current
@@ -97,7 +103,12 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: N
                 )
                 Row() {
                     Card(
-                        modifier = Modifier.padding(5.dp)
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .clickable {
+                                favViewModel.addToFav(flightArrival?.id.toString())
+                                favViewModel.addToFav(flightDeparture.id.toString())
+                            }
                     ) {
                         Icon(
                             modifier = Modifier
@@ -105,8 +116,8 @@ fun FlightCard(flightDeparture: Flight, flightArrival: Flight?, navController: N
                                 .clip(RoundedCornerShape(16.dp))
                                 .padding(5.dp)
                                 .size(30.dp),
-                            painter = painterResource(id = R.drawable.ic_notification),
-                            contentDescription = "notification"
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "favourite"
                         )
                     }
                     Card(
